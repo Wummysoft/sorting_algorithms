@@ -1,35 +1,50 @@
 #include "sort.h"
-void swap(int *a, int *b);
+
 /**
- * bubble_sort - sort an array of integer in ascending order
- * @array: the array to order and print
- * @size: size of array to order
+ * swap_pos - swaps position of values in array
+ *
+ * @array: array to be changed
+ * @first: first index
+ * @second: second index
  */
-void bubble_sort(int *array, size_t size)
+void swap_pos(int **array, size_t first, size_t second)
 {
-	unsigned int i = 0, j = 0;
-	if (size <= 1)
-		return;
-	for (i = 0; i < (size - 1); i++)
-		for (j = 1; j < size; j++)
-			if (array[j - 1] > array[j])
-			{
-				swap(&array[j - 1], &array[j]);
-				print_array(array, size);
-			}
+	int holder;
+
+	holder = (*array)[first];
+	(*array)[first] = (*array)[second];
+	(*array)[second] = holder;
 }
 
 /**
- * _swap - swap two pointers to integer
- * swap - swap two pointers to integer
+ * bubble_sort - sorting algorithm that sorts in form
+ * of a bubble
  *
- * @a: first int pointer
- * @b: second int pointer
+ * @array: array to be sorted
+ * @size: size of the array
  */
-void swap(int *a, int *b)
+void bubble_sort(int *array, size_t size)
 {
-	int swap;
-	swap = *a;
-	*a = *b;
-	*b = swap;
+	size_t i, j, flag;
+
+	if (size < 2)
+		return;
+
+	for (i = 0; i < size; i++)	/* go through the array */
+	{
+		flag = 0;
+		for (j = 0; j < size - i - 1; j++)	/* loop only the unsorted */
+		{
+			if (array[j] > array[j + 1])
+			{
+				swap_pos(&array, j, j + 1);
+				print_array(array, size);
+				flag = 1;
+			}
+		}
+
+		/* check if no swap occured (meaning array is sorted) */
+		if (!flag)
+			break;
+	}
 }
