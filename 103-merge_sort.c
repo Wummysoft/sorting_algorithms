@@ -1,71 +1,101 @@
 #include "sort.h"
+#include <stdio.h>
+
 /**
-  * quick_sort - quicksort algorithm
-  * @array: array to be sorted
-  * @size: size of array
-  */
-void quick_sort(int *array, size_t size)
+ * print_parse - prints the value in array
+ *
+ * @array: array to be printed
+ * @text: text to  printed alongside values
+ * @low: lower bound
+ * @high: upper bound
+ */
+void print_parse(int *array, const char *text, size_t low, size_t high)
 {
-	if (array == NULL || size <= 1)
+	size_t i;
+	char *separator = "";
+
+	printf("[%s]: ", text);
+	for (i = low; i <= high; i++)
+	{
+		printf("%s%d", separator, array[i]);
+		separator = ", ";
+	}
+	printf("\n");
+}
+/**
+ * join_parse - joins and sorts the values in the array
+ * parsed
+ *
+ * @arr: array to be sorted
+ * @low: starting index of the array passed
+ * @high: ending index of the array passed
+ * @mid: midpoint of the split array
+ * @copy: array to store sorted values
+ */
+void join_parse(int *arr, size_t low, size_t high, size_t mid, int *copy)
+{
+	size_t hStart = mid + 1, newIndex, lStart = low, i;
+
+	printf("Merging...\n");
+	print_parse(arr, "left", low, mid);
+	print_parse(arr, "right", mid + 1, high);
+
+	for (newIndex = low; newIndex <= high; newIndex++)  /* fill sorted val */
+	{
+		if ((lStart <= mid && arr[lStart] <= arr[hStart]) || hStart > high)
+			copy[newIndex] = arr[lStart++];
+		else
+			copy[newIndex] = arr[hStart++];
+	}
+
+	for (i = low; i <= high; i++)   /* update initial array with sorted arr */
+		arr[i] = copy[i];
+
+	print_parse(arr, "Done", low, high);
+}
+
+/**
+ * parser - recursively perform merge sort and sort the
+ * given array
+ *
+ * @array: array to be sorted
+ * @lb: lower bound
+ * @ub: upper bound
+ * @copy: array to store sorted values
+ */
+void parser(int *array, size_t lb, size_t ub, int *copy)
+{
+	size_t mid;
+
+	if (lb < ub)
+	{
+		mid = (ub + lb - 1) / 2;
+
+		parser(array, lb, mid, copy);
+		parser(array, mid + 1, ub, copy);
+
+		join_parse(array, lb, ub, mid, copy);
+	}
+}
+
+/**
+ * merge_sort - application of the merge sort
+ * algorithm to sort an array of integers
+ *
+ * @array: array to be sorted
+ * @size: size of the array
+ */
+void merge_sort(int *array, size_t size)
+{
+	int *clone;
+
+	if (!array || size < 2)   /* only one value or less in array */
 		return;
-	sort_alg(array, 0, size - 1, size);
-}
 
-/**
-  * sort_alg - recursive sorting algorithm
-  * @arr: array
-  * @left: leftmost index
-  * @right: rightmost index
-  * @size: full size of array
-  */
-void sort_alg(int *arr, int left, int right, size_t size)
-{
-	int pivot;
+	clone = malloc(sizeof(int) * size);
+	if (!clone)
+		return;
 
-	if (left < right)
-	{
-		pivot = split(arr, left, right, size);
-		sort_alg(arr, left, pivot - 1, size);
-		sort_alg(arr, pivot + 1, right, size);
-	}
-}
-
-/**
-  * split - split array
-  * @arr: array
-  * @left: leftmost index
-  * @right: rightmost index
-  * @size: full array size
-  * Return: pivot index
-  */
-int split(int *arr, int left, int right, size_t size)
-{
-	int i, i2, pivot, tmp;
-
-	pivot = arr[right];
-	i = left;
-
-	for (i2 = left; i2 < right; i2++)
-	{
-		if (arr[i2] < pivot)
-		{
-			if (i != i2)
-			{
-				tmp = arr[i2];
-				arr[i2] = arr[i];
-				arr[i] = tmp;
-				print_array(arr, size);
-			}
-			i++;
-		}
-	}
-	if (arr[i] != arr[right])
-	{
-		tmp = arr[i];
-		arr[i] = arr[right];
-		arr[right] = tmp;
-		print_array(arr, size);
-	}
-
-	return (i);
+	parser(array, 0, size - 1, clone);
+	free(clone);
 }
